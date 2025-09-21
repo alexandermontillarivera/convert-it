@@ -3,15 +3,18 @@ import { IconCheck, IconMoon, IconSettings, IconSun, IconX } from '@tabler/icons
 import { Box, Button, IconButton, Tooltip, Typography } from '@mui/material'
 import { useAppConversionSystem } from '@/contexts/app-conversion-system'
 import { CONVERSION_SYSTEM_LIST } from '@/enums/conversion-system'
+import { CONVERSION_SYSTEM_KEY } from '@/utils/conversion-system'
+import { setApplicationCookies } from '@/utils/cookies'
 import { useAppTheme } from '@/contexts/app-theme'
+import { THEME_MODE_KEY } from '@/utils/theme'
 import { ThemeMode } from '@/utils/theme'
 import { Chip } from '@mui/material'
 import { useState } from 'react'
 import { Drawer } from 'vaul'
 
 export function SettingsButton() {
-  const { excludeSystems } = useAppConversionSystem()
-  const { colors, theme } = useAppTheme()
+  const { excludeSystems, setExcludeSystems } = useAppConversionSystem()
+  const { colors, theme, setTheme } = useAppTheme()
 
   const [themeMode, setThemeMode] = useState<ThemeMode>(theme)
 
@@ -21,6 +24,34 @@ export function SettingsButton() {
       excluded: excludeSystems.includes(system.value)
     }))
   })
+
+
+  const handleSaveSettings = async () => {
+    if (themeMode !== theme) {
+      document.body.classList.remove(theme === 'light' ? 'light' : 'dark')
+      document.body.classList.add(themeMode === 'light' ? 'light' : 'dark')
+      setTheme(themeMode)
+    }
+
+    const newExcludedSystems = systems
+      .filter((system) => system.excluded)
+      .map((system) => system.value)
+
+    setExcludeSystems(newExcludedSystems)
+
+
+    await setApplicationCookies([
+      {
+        name: THEME_MODE_KEY,
+        value: themeMode,
+      },
+      {
+        name: CONVERSION_SYSTEM_KEY,
+        value: JSON.stringify(newExcludedSystems),
+      }
+    ])
+
+  }
 
   return (
     <>
@@ -291,6 +322,7 @@ export function SettingsButton() {
                 >
                   <Drawer.Close asChild>
                     <Button
+                      onClick={handleSaveSettings}
                       variant='contained'
                       sx={{
                         width: "100%",

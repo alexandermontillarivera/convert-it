@@ -1,6 +1,6 @@
 import { ConversionSystem } from "@/enums/conversion-system"
 
-const CONVERSION_SYSTEM_KEY = "conversion-system-excludes"
+export const CONVERSION_SYSTEM_KEY = "conversion-system-excludes"
 
 export const getConversionSystemExclude = async (): Promise<
 	ConversionSystem[]
