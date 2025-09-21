@@ -7,17 +7,17 @@ import { CONVERSION_SYSTEM_KEY } from '@/utils/conversion-system'
 import { setApplicationCookies } from '@/utils/cookies'
 import { useAppTheme } from '@/contexts/app-theme'
 import { THEME_MODE_KEY } from '@/utils/theme'
+import { useState, useEffect } from 'react'
 import { ThemeMode } from '@/utils/theme'
 import { Chip } from '@mui/material'
-import { useState } from 'react'
 import { Drawer } from 'vaul'
 
 export function SettingsButton() {
   const { excludeSystems, setExcludeSystems } = useAppConversionSystem()
   const { colors, theme, setTheme } = useAppTheme()
 
+  const [isOpen, setIsOpen] = useState(false)
   const [themeMode, setThemeMode] = useState<ThemeMode>(theme)
-
   const [systems, setSystems] = useState(() => {
     return CONVERSION_SYSTEM_LIST.map((system) => ({
       ...system,
@@ -25,6 +25,17 @@ export function SettingsButton() {
     }))
   })
 
+  useEffect(() => {
+    if (isOpen) {
+      setThemeMode(theme)
+      setSystems(
+        CONVERSION_SYSTEM_LIST.map((system) => ({
+          ...system,
+          excluded: excludeSystems.includes(system.value)
+        }))
+      )
+    }
+  }, [isOpen, theme, excludeSystems])
 
   const handleSaveSettings = async () => {
     if (themeMode !== theme) {
@@ -39,7 +50,6 @@ export function SettingsButton() {
 
     setExcludeSystems(newExcludedSystems)
 
-
     await setApplicationCookies([
       {
         name: THEME_MODE_KEY,
@@ -51,19 +61,29 @@ export function SettingsButton() {
       }
     ])
 
+    setIsOpen(false)
+  }
+
+  const handleClose = () => {
+    setIsOpen(false)
+  }
+
+  const handleOpen = () => {
+    setIsOpen(true)
   }
 
   return (
     <>
-      <Drawer.Root>
-        <Drawer.Trigger style={{
-          background: "transparent",
-          border: "none",
-          cursor: "pointer",
-        }}>
-          <IconButton
-            component="div"
-          >
+      <Drawer.Root open={isOpen} onOpenChange={setIsOpen}>
+        <Drawer.Trigger
+          onClick={handleOpen}
+          style={{
+            background: "transparent",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          <IconButton component="div">
             <IconSettings color={colors.text} />
           </IconButton>
         </Drawer.Trigger>
@@ -154,13 +174,11 @@ export function SettingsButton() {
                     </Typography>
                   </Box>
 
-
                   <Drawer.Close
+                    onClick={handleClose}
                     style={{ background: "transparent", border: "none", cursor: "pointer" }}
                   >
-                    <IconButton
-                      component="div"
-                    >
+                    <IconButton component="div">
                       <IconX color={colors.text} />
                     </IconButton>
                   </Drawer.Close>
@@ -198,19 +216,11 @@ export function SettingsButton() {
                         alignItems: 'center',
                         justifyContent: 'center',
                         backgroundColor: themeMode === 'light' ? colors.selectionBg : colors.bg,
-
                       }}
                       onClick={() => setThemeMode('light')}
                     >
-                      <IconSun
-                        color={colors.text}
-                        size={48}
-                      />
-
-                      <Typography
-                        fontSize={18}
-                        sx={{ marginTop: '1rem' }}
-                      >
+                      <IconSun color={colors.text} size={48} />
+                      <Typography fontSize={18} sx={{ marginTop: '1rem' }}>
                         Claro
                       </Typography>
                     </Button>
@@ -232,15 +242,8 @@ export function SettingsButton() {
                       }}
                       onClick={() => setThemeMode('dark')}
                     >
-                      <IconMoon
-                        color={colors.text}
-                        size={48}
-                      />
-
-                      <Typography
-                        fontSize={18}
-                        sx={{ marginTop: '1rem' }}
-                      >
+                      <IconMoon color={colors.text} size={48} />
+                      <Typography fontSize={18} sx={{ marginTop: '1rem' }}>
                         Oscuro
                       </Typography>
                     </Button>
@@ -320,21 +323,19 @@ export function SettingsButton() {
                     borderTop: `1px solid ${colors.border} `
                   }}
                 >
-                  <Drawer.Close asChild>
-                    <Button
-                      onClick={handleSaveSettings}
-                      variant='contained'
-                      sx={{
-                        width: "100%",
-                        maxWidth: {
-                          xs: "100%",
-                          sm: "200px"
-                        }
-                      }}
-                    >
-                      Guardar cambios
-                    </Button>
-                  </Drawer.Close>
+                  <Button
+                    onClick={handleSaveSettings}
+                    variant='contained'
+                    sx={{
+                      width: "100%",
+                      maxWidth: {
+                        xs: "100%",
+                        sm: "200px"
+                      }
+                    }}
+                  >
+                    Guardar cambios
+                  </Button>
                 </Box>
               </Box>
             </Box>
@@ -345,13 +346,11 @@ export function SettingsButton() {
   )
 }
 
-
 interface SectionProps {
   children: React.ReactNode
   title: string
   description: string
 }
-
 
 function SettingsSection({ children, title, description }: SectionProps) {
   return (
