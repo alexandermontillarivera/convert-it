@@ -86,7 +86,7 @@ export function SettingsButton() {
           }}
         >
           <IconButton component="div">
-            <IconSettings color={colors.text} />
+            <IconSettings className='hoverOpacityEffect' color={colors.text} />
           </IconButton>
         </Drawer.Trigger>
         <Drawer.Portal>

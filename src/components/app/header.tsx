@@ -3,6 +3,7 @@
 import { SettingsButton } from '@/components/app/settings-button'
 import { useAppTheme } from '@/contexts/app-theme'
 import { Box, Typography } from '@mui/material'
+import { IconBrandGithub } from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -62,8 +63,32 @@ export function Header() {
             </Typography>
           </Box>
         </Link>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            justifyContent: "center",
+          }}
+        >
 
-        <SettingsButton />
+          <Link
+            href="https://github.com/alexandermontillarivera/convert-it"
+            target="_blank"
+            className='hoverOpacityEffect'
+            rel='noopener noreferrer'
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+
+            }}
+          >
+            <IconBrandGithub color={colors.text} />
+          </Link>
+
+          <SettingsButton />
+        </Box>
       </Box>
     </Box>
   )
