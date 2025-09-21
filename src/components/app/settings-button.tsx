@@ -54,10 +54,12 @@ export function SettingsButton() {
       {
         name: THEME_MODE_KEY,
         value: themeMode,
+        days: 4000
       },
       {
         name: CONVERSION_SYSTEM_KEY,
         value: JSON.stringify(newExcludedSystems),
+        days: 4000
       }
     ])
 
