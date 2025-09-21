@@ -1,0 +1,46 @@
+export enum ConversionSystem {
+	DECIMAL_TO_HEXADECIMAL = "DECIMAL_TO_HEXADECIMAL",
+	DECIMAL_TO_BINARY = "DECIMAL_TO_BINARY",
+	DECIMAL_TO_OCTAL = "DECIMAL_TO_OCTAL",
+
+	BINARY_TO_HEXADECIMAL = "BINARY_TO_HEXADECIMAL",
+	BINARY_TO_DECIMAL = "BINARY_TO_DECIMAL",
+	BINARY_TO_OCTAL = "BINARY_TO_OCTAL",
+
+	OCTAL_TO_HEXADECIMAL = "OCTAL_TO_HEXADECIMAL",
+	OCTAL_TO_DECIMAL = "OCTAL_TO_DECIMAL",
+	OCTAL_TO_BINARY = "OCTAL_TO_BINARY",
+
+	HEXADECIMAL_TO_DECIMAL = "HEXADECIMAL_TO_DECIMAL",
+	HEXADECIMAL_TO_BINARY = "HEXADECIMAL_TO_BINARY",
+	HEXADECIMAL_TO_OCTAL = "HEXADECIMAL_TO_OCTAL",
+}
+
+export enum ConversionSystemBase {
+	DECIMAL = "DECIMAL",
+	BINARY = "BINARY",
+	OCTAL = "OCTAL",
+	HEXADECIMAL = "HEXADECIMAL",
+}
+
+const LABELS: Record<ConversionSystem, string> = {
+	BINARY_TO_DECIMAL: "Binario a Decimal",
+	BINARY_TO_HEXADECIMAL: "Binario a Hexadecimal",
+	BINARY_TO_OCTAL: "Binario a Octal",
+	DECIMAL_TO_BINARY: "Decimal a Binario",
+	DECIMAL_TO_HEXADECIMAL: "Decimal a Hexadecimal",
+	DECIMAL_TO_OCTAL: "Decimal a Octal",
+	HEXADECIMAL_TO_BINARY: "Hexadecimal a Binario",
+	HEXADECIMAL_TO_DECIMAL: "Hexadecimal a Decimal",
+	HEXADECIMAL_TO_OCTAL: "Hexadecimal a Octal",
+	OCTAL_TO_BINARY: "Octal a Binario",
+	OCTAL_TO_DECIMAL: "Octal a Decimal",
+	OCTAL_TO_HEXADECIMAL: "Octal a Hexadecimal",
+}
+
+export const CONVERSION_SYSTEM_LIST = Object.values(ConversionSystem).map(
+	(item) => ({
+		value: item,
+		label: LABELS[item],
+	}),
+)
