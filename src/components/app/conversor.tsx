@@ -247,6 +247,21 @@ function CalculatorForm() {
     setResult("")
   }
 
+  useEffect(() => {
+    const handleChangeConfig = () => {
+      setResult("")
+      setValue1("")
+      setValue2("")
+      setOperation('ADD')
+    }
+
+    document.addEventListener(SETTINGS_EVENT_KEY, handleChangeConfig)
+
+    return () => {
+      document.removeEventListener(SETTINGS_EVENT_KEY, handleChangeConfig)
+    }
+  }, [])
+
   return (
     <SubmitForm
       actionTimeout={0}

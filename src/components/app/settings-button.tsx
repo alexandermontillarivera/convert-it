@@ -51,18 +51,22 @@ export function SettingsButton() {
 
     setExcludeSystems(newExcludedSystems)
 
-    await setApplicationCookies([
-      {
-        name: THEME_MODE_KEY,
-        value: themeMode,
-        days: 4000
-      },
-      {
-        name: CONVERSION_SYSTEM_KEY,
-        value: JSON.stringify(newExcludedSystems),
-        days: 4000
-      }
-    ])
+    try {
+      await setApplicationCookies([
+        {
+          name: THEME_MODE_KEY,
+          value: themeMode,
+          days: 4000
+        },
+        {
+          name: CONVERSION_SYSTEM_KEY,
+          value: JSON.stringify(newExcludedSystems),
+          days: 4000
+        }
+      ])
+    } catch {
+
+    }
 
     document.dispatchEvent(new Event(SETTINGS_EVENT_KEY))
 
