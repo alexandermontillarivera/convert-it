@@ -7,6 +7,8 @@ import { getThemeMode } from '@/utils/theme'
 import { poppins } from '@/config/fonts'
 import "@/styles/app/globals.css"
 import { Metadata } from "next"
+import { Toaster } from 'sonner'
+import { LoaderProvider } from '@/contexts/app-loader'
 
 
 export const metadata: Metadata = {
@@ -40,13 +42,25 @@ export default async function RootLayout({
           <AppConversionSystemProvider
             initialExcludeSystems={excludeSystems}
           >
-            <AppThemeProvider
-              initialMode={theme}
-            >
-              {children}
-            </AppThemeProvider>
+            <LoaderProvider>
+              <AppThemeProvider
+                initialMode={theme}
+              >
+                {children}
+              </AppThemeProvider>
+            </LoaderProvider>
           </AppConversionSystemProvider>
         </MaterialUIProvider>
+
+        <Toaster
+          richColors
+          closeButton
+          visibleToasts={1}
+          position='top-right'
+          style={{
+            width: "100%",
+          }}
+        />
       </body>
     </html>
   )

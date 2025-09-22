@@ -1,3 +1,4 @@
+import { Conversor } from '@/components/app/conversor'
 import { Header } from '@/components/app/header'
 import { Box, Typography } from '@mui/material'
 
@@ -37,6 +38,7 @@ export default function ApplicationPage() {
           Una herramienta para convertir sistemas de medidas informáticas.
         </Typography>
 
+        <Conversor />
       </Box>
     </Box>
   )

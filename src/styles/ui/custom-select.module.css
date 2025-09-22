@@ -1,0 +1,15 @@
+.container {
+  width: 100%;
+  position: relative;
+  margin: 0px;
+}
+
+.container::after {
+  content: attr(data-error);
+  position: absolute;
+  top: calc(100% + 7px);
+  left: 0;
+  font-size: 12px;
+  margin-bottom: 8px;
+  color: #e74d53;
+}

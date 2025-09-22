@@ -40,5 +40,44 @@ export const MATERIAL_THEME_CONFIG = createTheme({
 				}),
 			},
 		},
+		MuiFormHelperText: {
+			styleOverrides: {
+				root: {
+					marginLeft: "0px",
+					color: "#e74d53 !important",
+				},
+			},
+		},
+		MuiTextField: {
+			styleOverrides: {
+				root: {
+					borderRadius: "16px",
+
+					"& .MuiOutlinedInput-root": {
+						"& fieldset": {
+							border: "none",
+							borderRadius: "6px",
+						},
+						"&.Mui-focused fieldset": {
+							borderRadius: "6px",
+						},
+						"&:hover fieldset": {
+							borderRadius: "6px",
+						},
+						"&.Mui-disabled": {
+							"& fieldset": {
+								border: "none",
+								opacity: 0.2,
+							},
+						},
+
+						"&::placeholder": {
+							color: "#ffffff80",
+							opacity: 1,
+						},
+					},
+				},
+			},
+		},
 	},
 })
