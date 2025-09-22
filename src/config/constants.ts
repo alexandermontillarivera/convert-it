@@ -23,3 +23,5 @@ export const VALIDITY_ERROR_KEYS = Object.keys(
 
 export const SCIENTIFIC_NOTATION_ELEMENTS = ["e", "E", "+", "-"]
 export const REGEX_CONTAINS_SCIENCE_NOTATION = /e|E|\+|-/
+
+export const SETTINGS_EVENT_KEY = "settings:update"

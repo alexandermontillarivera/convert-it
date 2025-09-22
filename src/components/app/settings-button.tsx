@@ -11,6 +11,7 @@ import { useState, useEffect } from 'react'
 import { ThemeMode } from '@/utils/theme'
 import { Chip } from '@mui/material'
 import { Drawer } from 'vaul'
+import { SETTINGS_EVENT_KEY } from '@/config/constants'
 
 export function SettingsButton() {
   const { excludeSystems, setExcludeSystems } = useAppConversionSystem()
@@ -62,6 +63,8 @@ export function SettingsButton() {
         days: 4000
       }
     ])
+
+    document.dispatchEvent(new Event(SETTINGS_EVENT_KEY))
 
     setIsOpen(false)
   }
