@@ -1,7 +1,8 @@
 "use client"
 import { Select as SelectMui, Typography, MenuItem } from "@mui/material"
-import { useEffect, useMemo, useState } from 'react'
+import styles from '@/styles/ui/custom-select.module.css'
 import { IconChevronDown } from '@tabler/icons-react'
+import { useEffect, useMemo, useState } from 'react'
 import { useAppTheme } from '@/contexts/app-theme'
 
 export interface IOption {
@@ -66,6 +67,7 @@ export function CustomSelect(props: Props) {
       title={placeholder}
       style={{ marginBottom: error ? "30px" : 0, width: "100%" }}
       data-error={error ?? undefined}
+      className={styles.container}
     >
       {label && (
         <Typography gutterBottom sx={{ fontSize: "14px", marginBottom: "8px" }}>
