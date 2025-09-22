@@ -1,16 +1,17 @@
 "use client"
 
+import { Box, Button, IconButton, Tab, Tabs, Typography } from '@mui/material'
+import { CALCULATOR, BINARY_OPERATIONS } from '@/utils/conversion-system'
 import { useAppConversionSystem } from '@/contexts/app-conversion-system'
-import { Box, Button, IconButton, Tab, Tabs } from '@mui/material'
 import { CONVERSION_SYSTEM_LIST } from '@/enums/conversion-system'
 import { CustomSelect } from '@/components/ui/custom-select'
 import { SubmitForm } from '@/components/logic/submit-form'
 import { CustomInput } from '@/components/ui/custom-input'
-import { CALCULATOR } from '@/utils/conversion-system'
+import { SETTINGS_EVENT_KEY } from '@/config/constants'
 import { useAppTheme } from '@/contexts/app-theme'
 import { IconCopy } from '@tabler/icons-react'
 import { useSubmit } from '@/hooks/use-form'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 export function Conversor() {
@@ -92,6 +93,7 @@ function CustomTabPanel(props: TabPanelProps) {
 function ConversionForm() {
   const { excludeSystems } = useAppConversionSystem()
   const [result, setResult] = useState<string>("")
+  const [system, setSystem] = useState<string>("")
   const [value, setValue] = useState<string>("")
   const { colors } = useAppTheme()
 
@@ -115,6 +117,22 @@ function ConversionForm() {
     })
   })
 
+
+  useEffect(() => {
+
+    const handleChangeConfig = () => {
+      setResult("")
+      setValue("")
+      setSystem("")
+    }
+
+    document.addEventListener(SETTINGS_EVENT_KEY, handleChangeConfig)
+
+    return () => {
+      document.removeEventListener(SETTINGS_EVENT_KEY, handleChangeConfig)
+    }
+  }, [])
+
   return (
     <SubmitForm
       actionTimeout={0}
@@ -122,12 +140,14 @@ function ConversionForm() {
       manageLoading={false}
     >
       <CustomSelect
-        label='Tipo de conversion'
+        label='Tipo de conversión'
         data={options}
         name='conversionType'
-        onChange={() => {
+        value={system}
+        onChange={(option) => {
           setResult("")
           setValue("")
+          setSystem(option ? option.value : "")
         }}
       />
 
@@ -180,6 +200,9 @@ function ConversionForm() {
         >
           <IconButton
             disabled={!result}
+            style={{
+              opacity: result ? 1 : 0.5
+            }}
             onClick={() => {
               navigator.clipboard.writeText(result).then(() => {
                 toast.success("Resultado copiado al portapapeles")
@@ -198,9 +221,166 @@ function ConversionForm() {
 }
 
 function CalculatorForm() {
+  const [result, setResult] = useState<string>("")
+  const [value1, setValue1] = useState<string>("")
+  const [value2, setValue2] = useState<string>("")
+  const [operation, setOperation] = useState<'ADD' | 'SUBTRACT'>('ADD')
+  const { colors } = useAppTheme()
+
+  const handleSubmit = useSubmit(({ resolve, data, reject }) => {
+    try {
+      const result = BINARY_OPERATIONS[operation](data.value1, data.value2)
+      setResult(result)
+    } catch (error) {
+      reject((error as Error).message || "Error al calcular")
+    }
+
+    resolve({
+      notDisabledFields: true,
+      message: "",
+      notMessage: true,
+    })
+  })
+
+  const handleOperationClick = (op: 'ADD' | 'SUBTRACT') => {
+    setOperation(op)
+    setResult("")
+  }
+
   return (
-    <>
-    </>
+    <SubmitForm
+      actionTimeout={0}
+      submit={handleSubmit}
+      manageLoading={false}
+    >
+      <Box
+        sx={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 1,
+        }}
+      >
+        <Typography
+          sx={{
+            width: '100%',
+          }}
+          textAlign="left"
+          fontSize={14}
+        >
+          Selecciona la operación que deseas realizar:
+        </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+            width: '100%',
+            flexDirection: { xs: 'column', sm: 'row' }
+          }}
+        >
+          <Button
+            type="button"
+            variant={operation === 'ADD' ? "contained" : "outlined"}
+            fullWidth
+            onClick={() => handleOperationClick('ADD')}
+            sx={{
+              border: `1px solid ${colors.border} !important`,
+              color: operation === 'ADD' ? colors.primary : colors.text,
+              backgroundColor: operation === 'ADD' ? colors.primary + '10' : 'transparent'
+            }}
+          >
+            Suma
+          </Button>
+          <Button
+            type="button"
+            variant={operation === 'SUBTRACT' ? "contained" : "outlined"}
+            fullWidth
+            onClick={() => handleOperationClick('SUBTRACT')}
+            sx={{
+              border: `1px solid ${colors.border} !important`,
+              color: operation === 'SUBTRACT' ? colors.primary : colors.text,
+              backgroundColor: operation === 'SUBTRACT' ? colors.primary + '10' : 'transparent'
+            }}
+          >
+            Resta
+          </Button>
+        </Box>
+      </Box>
+
+      <CustomInput
+        label="Primer número binario"
+        type="text"
+        placeholder='Ej: 1010'
+        name='value1'
+        value={value1}
+        onChange={(e) => setValue1(e.target.value)}
+      />
+
+      <CustomInput
+        label="Segundo número binario"
+        type="text"
+        placeholder='Ej: 1100'
+        name='value2'
+        value={value2}
+        onChange={(e) => setValue2(e.target.value)}
+      />
+
+      <Button
+        type='submit'
+        variant='contained'
+        fullWidth
+      >
+        Calcular
+      </Button>
+
+      <Box
+        sx={{
+          width: "100%",
+          position: "relative"
+        }}
+      >
+        <CustomInput
+          label="Resultado"
+          type="text"
+          value={result}
+          placeholder='Resultado...'
+          readonly
+        />
+
+        <Box
+          sx={{
+            position: "absolute",
+            height: "30px",
+            width: "30px",
+            right: "10px",
+            top: "50%",
+            background: colors.border + "70",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: "6px",
+          }}
+        >
+          <IconButton
+            disabled={!result}
+            style={{
+              opacity: result ? 1 : 0.5
+            }}
+            onClick={() => {
+              navigator.clipboard.writeText(result).then(() => {
+                toast.success("Resultado copiado al portapapeles")
+              }).catch(() => {
+                toast.error("Error al copiar el resultado")
+              })
+            }}
+          >
+            <IconCopy color={colors.text} size={20} />
+          </IconButton>
+        </Box>
+      </Box>
+
+    </SubmitForm>
   )
 }
 

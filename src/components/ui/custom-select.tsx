@@ -1,59 +1,60 @@
 "use client"
 import { Select as SelectMui, Typography, MenuItem } from "@mui/material"
-import styles from "@/styles/ui/custom-select.module.css"
+import { useEffect, useMemo, useState } from 'react'
 import { IconChevronDown } from '@tabler/icons-react'
 import { useAppTheme } from '@/contexts/app-theme'
-import { useState } from 'react'
 
 export interface IOption {
   value: string
   label: string | React.ReactNode
 }
+
 interface Props {
   placeholder?: string
-  value?: string
+  value?: string | null
   name?: string
   optional?: boolean
   data?: IOption[]
   customError?: string | null
   onChange?: (value: IOption | null) => void
-  label?: string,
-  defaultValue?: IOption,
-  size?: "small" | "medium" | "large",
-  valueMaxWidth?: string,
+  label?: string
+  size?: "small" | "medium" | "large"
+  valueMaxWidth?: string
 }
 
 export function CustomSelect(props: Props) {
   const { colors } = useAppTheme()
-
   const {
     placeholder = "Seleccionar",
     data = [],
     optional = false,
     customError = null,
     name,
-    value: fieldValue = null,
+    value: externalValue = null,
     onChange,
     label,
-    defaultValue,
     size = "large",
     valueMaxWidth
   } = props
 
   const getHeightBySize = () => {
     switch (size) {
-      case "small":
-        return 32
-      case "medium":
-        return 40
+      case "small": return 32
+      case "medium": return 40
       case "large":
-      default:
-        return 48
+      default: return 48
     }
   }
 
   const [error, setError] = useState<string | null>(customError)
-  const [value, setValue] = useState<string | null>(fieldValue)
+  useEffect(() => setError(customError), [customError])
+
+  const normalizedValue = useMemo(() => {
+    const v = externalValue ?? ""
+    if (v === "") return ""
+    const exists = data.some(o => o.value === v)
+    return exists ? v : ""
+  }, [externalValue, data])
 
   const handleOnInvalid = (e: React.FormEvent<HTMLInputElement>) => {
     e.preventDefault()
@@ -62,42 +63,40 @@ export function CustomSelect(props: Props) {
 
   return (
     <div
-      className={styles.container}
       title={placeholder}
-      data-error={error}
-      style={{
-        marginBottom: error ? "30px" : 0,
-      }}
+      style={{ marginBottom: error ? "30px" : 0, width: "100%" }}
+      data-error={error ?? undefined}
     >
-      {
-        label &&
-        <Typography gutterBottom sx={{
-          fontSize: "14px",
-          marginBottom: "8px",
-        }}>
+      {label && (
+        <Typography gutterBottom sx={{ fontSize: "14px", marginBottom: "8px" }}>
           {label}
         </Typography>
-      }
+      )}
+
       <SelectMui
         fullWidth
         displayEmpty
-        defaultValue={defaultValue}
-        value={value || ""}
         name={name}
         required={!optional}
-        IconComponent={(props) => <IconChevronDown {...props} color={colors.text}
-          style={{
-            textAlign: "center",
-            position: "absolute",
-            right: 16,
-            top: "50%",
-            transform: "translateY(-50%)",
-            color: "var(--neutral-black-2)"
-          }} />}
+        value={normalizedValue}
         onInvalid={handleOnInvalid}
         error={Boolean(error)}
-        renderValue={(value: any) => {
-          if (!value) {
+        IconComponent={(p) => (
+          <IconChevronDown
+            color={colors.text}
+            {...p}
+            style={{
+              textAlign: "center",
+              position: "absolute",
+              right: 16,
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: "var(--neutral-black-2)"
+            }}
+          />
+        )}
+        renderValue={(val: any) => {
+          if (!val) {
             return (
               <Typography sx={{
                 color: colors.text,
@@ -107,34 +106,27 @@ export function CustomSelect(props: Props) {
               </Typography>
             )
           }
-          const option = data.find((option) => option.value === value) || null
-          if (!option) {
-            return null
-          }
-          return (
-            typeof option.label === 'string' ? (
-              <Typography
-                sx={{
-                  whiteSpace: "nowrap",
-                  overflow: "clip",
-                  textOverflow: "ellipsis",
-                  color: colors.text,
-                  maxWidth: valueMaxWidth,
-                  fontSize: size === "small" ? "12px" : "16px",
-                }}
-              >
+          const option = data.find(o => o.value === val)
+          if (!option) return null
+          return typeof option.label === 'string'
+            ? (
+              <Typography sx={{
+                whiteSpace: "nowrap",
+                overflow: "clip",
+                textOverflow: "ellipsis",
+                color: colors.text,
+                maxWidth: valueMaxWidth,
+                fontSize: size === "small" ? "12px" : "16px",
+              }}>
                 {option.label}
               </Typography>
-            ) : option.label
-          )
+            )
+            : option.label
         }}
         onChange={(e) => {
-          const value = e.target.value as string
-          const option = data.find((option) => option.value === value) || null
-          if (error && option) {
-            setError(null)
-          }
-          setValue(value)
+          const v = e.target.value as string
+          const option = data.find(o => o.value === v) ?? null
+          if (error && option) setError(null)
           onChange?.(option)
         }}
         sx={{
@@ -142,20 +134,13 @@ export function CustomSelect(props: Props) {
           height: getHeightBySize(),
           borderRadius: "6px",
           background: colors.border + "70",
-          "& .MuiOutlinedInput-notchedOutline": {
-            borderColor: `${colors.border} !important`,
-          },
-          "&:hover .MuiOutlinedInput-notchedOutline": {
-            borderColor: "red",
-          },
-          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-            borderColor: "red",
-          },
+          "& .MuiOutlinedInput-notchedOutline": { borderColor: `${colors.border} !important` },
+          "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "red" },
+          "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "red" },
           "& .MuiSelect-select": {
-            padding: size === "small" ? "4px 16px 4px 16px" : "8px 16px 8px 16px",
+            padding: size === "small" ? "4px 16px" : "8px 16px",
           },
         }}
-
         MenuProps={{
           disableScrollLock: true,
           PaperProps: {
@@ -168,26 +153,16 @@ export function CustomSelect(props: Props) {
               backgroundColor: colors.bg,
             },
             sx: {
-              "&::-webkit-scrollbar": {
-                width: "8px",
-              },
-              "&::-webkit-scrollbar-track": {
-                backgroundColor: "#1a1a1a",
-                borderRadius: "4px",
-              },
-              "&::-webkit-scrollbar-thumb": {
-                backgroundColor: "red",
-                borderRadius: "4px",
-                "&:hover": {
-                },
-              },
-              "&::-webkit-scrollbar-thumb:active": {
-              },
+              "&::-webkit-scrollbar": { width: "8px" },
+              "&::-webkit-scrollbar-track": { backgroundColor: "#1a1a1a", borderRadius: "4px" },
+              "&::-webkit-scrollbar-thumb": { backgroundColor: "red", borderRadius: "4px" },
               scrollbarWidth: "thin",
             },
           },
         }}
       >
+        <MenuItem value="" sx={{ display: "none" }} />
+
         {data.map((option) => (
           <MenuItem
             key={option.value}
@@ -196,44 +171,15 @@ export function CustomSelect(props: Props) {
               fontSize: size === "small" ? "14px" : "16px",
               color: colors.text,
               fontWeight: 400,
-              ":hover": {
-                backgroundColor: colors.primary + "80",
-                color: "#FFF",
-
-              },
-              "&.Mui-focused": {
-                backgroundColor: colors.primary + "80",
-                color: "#FFF",
-
-              },
-              "&:focus": {
-                color: "#FFF",
-
-                backgroundColor: colors.primary + "80",
-              },
-              "&.Mui-selected": {
-                backgroundColor: colors.primary + "80",
-                color: "#FFF",
-              },
-              "&.Mui-selected:hover": {
-                backgroundColor: colors.primary + "80",
-                color: "#FFF",
-
-              },
-              "&.Mui-selected:focus": {
-                backgroundColor: colors.primary + "80",
-                color: "#FFF",
-
+              ":hover": { backgroundColor: colors.primary + "80", color: "#FFF" },
+              "&.Mui-focused, &:focus, &.Mui-selected, &.Mui-selected:hover, &.Mui-selected:focus": {
+                backgroundColor: colors.primary + "80", color: "#FFF",
               },
               borderRadius: "6px",
-              "&:last-of-type": {
-                marginBottom: 0,
-              },
             }}
           >
             {option.label}
           </MenuItem>
-
         ))}
       </SelectMui>
     </div>

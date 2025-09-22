@@ -167,3 +167,47 @@ export const CALCULATOR: Record<ConversionSystem, (input: string) => string> = {
 		}
 	},
 }
+
+export const BINARY_OPERATIONS = {
+	ADD: (binary1: string, binary2: string): string => {
+		const b1 = binary1.trim()
+		const b2 = binary2.trim()
+
+		if (!b1 || !isValidBinary(b1)) throw new Error("Primer número binario inválido")
+		if (!b2 || !isValidBinary(b2)) throw new Error("Segundo número binario inválido")
+
+		try {
+			const num1 = parseInt(b1, 2)
+			const num2 = parseInt(b2, 2)
+			const result = num1 + num2
+			return `${result.toString(2)}₂`
+		} catch {
+			throw new Error("Error al sumar los números binarios")
+		}
+	},
+
+	SUBTRACT: (binary1: string, binary2: string): string => {
+		const b1 = binary1.trim()
+		const b2 = binary2.trim()
+
+		if (!b1 || !isValidBinary(b1)) throw new Error("Primer número binario inválido")
+		if (!b2 || !isValidBinary(b2)) throw new Error("Segundo número binario inválido")
+
+		try {
+			const num1 = parseInt(b1, 2)
+			const num2 = parseInt(b2, 2)
+
+			if (num1 < num2) {
+				throw new Error("El resultado sería negativo. Solo se admiten resultados positivos")
+			}
+
+			const result = num1 - num2
+			return `${result.toString(2)}₂`
+		} catch (error) {
+			if (error instanceof Error && error.message.includes("negativo")) {
+				throw error
+			}
+			throw new Error("Error al restar los números binarios")
+		}
+	}
+}
