@@ -3,6 +3,7 @@ import { Header } from '@/components/app/header'
 import { Box, Typography } from '@mui/material'
 
 export default function ApplicationPage() {
+
   return (
     <Box
       component="main"
